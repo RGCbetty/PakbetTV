@@ -1,5 +1,5 @@
-const cron = require('node-cron');
-const orderTimeoutService = require('../services/orderTimeoutService');
+const cron = require("node-cron");
+const orderTimeoutService = require("../services/orderTimeoutService");
 
 /**
  * Order Timeout Cron Job
@@ -16,18 +16,22 @@ class OrderTimeoutCron {
    */
   async executeTimeoutCheck() {
     try {
-      console.log('⏰ Running scheduled order timeout check...');
+      console.log("⏰ Running scheduled order timeout check...");
       const result = await orderTimeoutService.cancelExpiredOrders();
-      
+
       if (result.cancelled > 0) {
-        console.log(`✅ Order timeout check completed: ${result.cancelled} orders cancelled`);
+        console.log(
+          `✅ Order timeout check completed: ${result.cancelled} orders cancelled`
+        );
       } else {
-        console.log('✅ Order timeout check completed: No expired orders found');
+        console.log(
+          "✅ Order timeout check completed: No expired orders found"
+        );
       }
-      
+
       return result;
     } catch (error) {
-      console.error('❌ Error in scheduled order timeout check:', error);
+      console.error("❌ Error in scheduled order timeout check:", error);
       return { error: error.message };
     }
   }
@@ -38,26 +42,30 @@ class OrderTimeoutCron {
    */
   start() {
     if (this.isScheduled) {
-      console.log('Order timeout cron job is already scheduled');
+      console.log("Order timeout cron job is already scheduled");
       return;
     }
 
     // Schedule to run every 30 minutes
     // This ensures expired orders are cancelled reasonably quickly
-    this.cronJob = cron.schedule('*/30 * * * *', async () => {
-      await this.executeTimeoutCheck();
-    }, {
-      scheduled: false,
-      timezone: "Asia/Manila" // Adjust timezone as needed
-    });
+    this.cronJob = cron.schedule(
+      "*/30 * * * *",
+      async () => {
+        await this.executeTimeoutCheck();
+      },
+      {
+        scheduled: false,
+        timezone: "Asia/Manila", // Adjust timezone as needed
+      }
+    );
 
     this.cronJob.start();
     this.isScheduled = true;
-    
-    console.log('Order timeout cron job started');
-    console.log('Schedule: Every 30 minutes for automatic order cancellation');
-    console.log('Timezone: Asia/Manila');
-    console.log('Will cancel orders that are unpaid after 3 hours');
+
+    console.log("Order timeout cron job started");
+    console.log("Schedule: Every 30 minutes for automatic order cancellation");
+    console.log("Timezone: Asia/Manila");
+    console.log("Will cancel orders that are unpaid after 3 hours");
   }
 
   /**
@@ -67,7 +75,7 @@ class OrderTimeoutCron {
     if (this.cronJob) {
       this.cronJob.stop();
       this.isScheduled = false;
-      console.log('Order timeout cron job stopped');
+      console.log("Order timeout cron job stopped");
     }
   }
 
@@ -78,9 +86,9 @@ class OrderTimeoutCron {
     return {
       isScheduled: this.isScheduled,
       isRunning: this.cronJob ? this.cronJob.running : false,
-      schedule: 'Every 30 minutes',
-      timezone: 'Asia/Manila',
-      description: 'Automatically cancels unpaid orders after 3 hours'
+      schedule: "Every 30 minutes",
+      timezone: "Asia/Manila",
+      description: "Automatically cancels unpaid orders after 3 hours",
     };
   }
 
@@ -88,7 +96,7 @@ class OrderTimeoutCron {
    * Manually trigger a timeout check (for testing or admin use)
    */
   async manualTrigger() {
-    console.log('📢 Manual order timeout check triggered');
+    console.log("📢 Manual order timeout check triggered");
     return await this.executeTimeoutCheck();
   }
 }

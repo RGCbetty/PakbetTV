@@ -1,16 +1,16 @@
-const nodemailer = require('nodemailer');
-const path = require('path');
-const fs = require('fs');
-const fsPromises = require('fs').promises;
-const https = require('https');
-const http = require('http');
-const db = require('../config/db');
+const nodemailer = require("nodemailer");
+const path = require("path");
+const fs = require("fs");
+const fsPromises = require("fs").promises;
+const https = require("https");
+const http = require("http");
+const db = require("../config/db");
 
 // Create reusable transporter object using SMTP transport with connection pooling
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_SECURE === 'true',
+  secure: process.env.SMTP_SECURE === "true",
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -27,13 +27,17 @@ const transporter = nodemailer.createTransport({
 
 // Function to format price with right alignment
 const formatPrice = (price) => {
-  return `₱${Number(price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `₱${Number(price).toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 };
 
 // Dynamic API base URL based on environment
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://api.michaeldemesa.com'
-  : process.env.API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.michaeldemesa.com"
+    : process.env.API_BASE_URL || "http://localhost:5000";
 
 // Function to generate common footer HTML
 const generateFooterHtml = () => `
@@ -82,10 +86,10 @@ const generateEmailTemplate = (content) => `
 
 // Function to get email header attachment
 const getEmailHeaderAttachment = () => ({
-  filename: 'Michael De Mesa Feng Shui Consultancy-header.png',
-  path: path.join(__dirname, '../../client/public/Emailheader-Latest.png'),
-  cid: 'emailHeader',
-  contentDisposition: 'inline'
+  filename: "Michael De Mesa Feng Shui Consultancy-header.png",
+  path: path.join(__dirname, "../../client/public/Emailheader-Latest.png"),
+  cid: "emailHeader",
+  contentDisposition: "inline",
 });
 
 // Simplified function to send order confirmation email (without product images)
@@ -102,27 +106,36 @@ const sendOrderConfirmationEmail = async (orderDetails) => {
     shippingAddress,
     paymentMethod,
     paymentReference,
-    trackingNumber
+    trackingNumber,
   } = orderDetails;
 
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
   const calculatedTotal = subtotal + shippingFee - discount;
 
   // Only include header image attachment (no product images)
   const attachments = [getEmailHeaderAttachment()];
 
   // Generate items HTML without images
-  const itemsHtml = items.map(item => {
-    return `
+  const itemsHtml = items
+    .map((item) => {
+      return `
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">
           <span>${item.name}</span>
         </td>
-        <td style="padding: 8px; text-align: right; border: 1px solid #ddd; width: 100px;">${item.quantity}</td>
-        <td style="padding: 8px; text-align: right; border: 1px solid #ddd; width: 120px;">₱${item.price.toFixed(2)}</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd; width: 100px;">${
+          item.quantity
+        }</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd; width: 120px;">₱${item.price.toFixed(
+          2
+        )}</td>
       </tr>
     `;
-  }).join('');
+    })
+    .join("");
 
   const content = `
     <h2>Order Confirmation</h2>
@@ -151,36 +164,52 @@ const sendOrderConfirmationEmail = async (orderDetails) => {
     <table style="width:100%; max-width:300px; margin-left:auto;">
       <tr>
         <td style="padding:4px 0; text-align:left;">Subtotal:</td>
-        <td style="padding:4px 0; text-align:right; width:120px;">₱${subtotal.toFixed(2)}</td>
+        <td style="padding:4px 0; text-align:right; width:120px;">₱${subtotal.toFixed(
+          2
+        )}</td>
       </tr>
-      ${discount > 0 ? `
+      ${
+        discount > 0
+          ? `
       <tr>
         <td style="padding:4px 0; text-align:left;">Discount:</td>
-        <td style="padding:4px 0; text-align:right;">-₱${discount.toFixed(2)}</td>
+        <td style="padding:4px 0; text-align:right;">-₱${discount.toFixed(
+          2
+        )}</td>
       </tr>
-      ` : ''}
+      `
+          : ""
+      }
       <tr>
         <td style="padding:4px 0; text-align:left;">Shipping:</td>
-        <td style="padding:4px 0; text-align:right;">₱${shippingFee.toFixed(2)}</td>
+        <td style="padding:4px 0; text-align:right;">₱${shippingFee.toFixed(
+          2
+        )}</td>
       </tr>
       <tr>
         <td colspan="2" style="padding:0; border-bottom:1px solid #000;"></td>
       </tr>
       <tr>
         <td style="padding:4px 0; text-align:left; font-weight:bold;">Total:</td>
-        <td style="padding:4px 0; text-align:right; font-weight:bold;">₱${calculatedTotal.toFixed(2)}</td>
+        <td style="padding:4px 0; text-align:right; font-weight:bold;">₱${calculatedTotal.toFixed(
+          2
+        )}</td>
       </tr>
     </table>
 
     <div class="shipping-info" style="margin-top:30px;">
       <h3>Shipping Details:</h3>
       <p><strong>Delivery Address:</strong><br/>${shippingAddress}</p>
-      ${trackingNumber ? `
+      ${
+        trackingNumber
+          ? `
         <div class="tracking-info" style="background-color: #f9f9f9; padding: 15px; margin: 20px 0;">
           <p><strong>Tracking Number:</strong> ${trackingNumber}</p>
           <p>You can track your order using this tracking number on our website.</p>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
     </div>
   `;
 
@@ -190,31 +219,27 @@ const sendOrderConfirmationEmail = async (orderDetails) => {
       to: customerEmail,
       subject: `Order Confirmation #${orderNumber}`,
       html: generateEmailTemplate(content),
-      attachments: attachments
+      attachments: attachments,
     });
 
-    console.log('Order confirmation email sent:', info.messageId);
+    console.log("Order confirmation email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Order confirmation email error:', error.message);
+    console.error("Order confirmation email error:", error.message);
     return { success: false, error: error.message };
   }
 };
 
 // Simplified review request email (without product images)
 const sendReviewRequestEmail = async (details) => {
-  const {
-    orderNumber,
-    customerName,
-    customerEmail,
-    items = []
-  } = details;
+  const { orderNumber, customerName, customerEmail, items = [] } = details;
 
-  const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'https://michaeldemesa.com';
+  const FRONTEND_BASE_URL =
+    process.env.FRONTEND_BASE_URL || "https://michaeldemesa.com";
   const attachments = [getEmailHeaderAttachment()];
 
   // Generate items HTML without images
-  const itemsHtml = items.map(item => {
+  const itemsHtml = items.map((item) => {
     return `
       <li style="display:flex; align-items:center; margin-bottom:16px; background-color:#ffffff; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.08); padding:12px;">
         <div style="flex:1;">
@@ -237,7 +262,7 @@ const sendReviewRequestEmail = async (details) => {
 
     <h3>Your Products:</h3>
     <ul style="padding-left: 0; list-style: none;">
-      ${itemsHtml.join('')}
+      ${itemsHtml.join("")}
     </ul>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -261,13 +286,13 @@ const sendReviewRequestEmail = async (details) => {
       to: customerEmail,
       subject: `How was your order #${orderNumber}? Leave a review`,
       html: generateEmailTemplate(content),
-      attachments: attachments
+      attachments: attachments,
     });
-    
-    console.log('Review request email sent:', info.messageId);
+
+    console.log("Review request email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (err) {
-    console.error('Review email error:', err.message);
+    console.error("Review email error:", err.message);
     return { success: false, error: err.message };
   }
 };
@@ -288,24 +313,24 @@ const sendContactFormEmail = async (contactDetails) => {
     
     <div class="tracking-info" style="background-color: #f9f9f9; padding: 15px; margin: 20px 0;">
       <h3>Message:</h3>
-      <p>${message.replace(/\n/g, '<br>')}</p>
+      <p>${message.replace(/\n/g, "<br>")}</p>
     </div>
   `;
 
   try {
     const info = await transporter.sendMail({
       from: `"MICHAEL DE MESA - BAZI & FENG SHUI CONSULTANCY" <${process.env.SMTP_USER}>`,
-      to: 'hello@michaeldemesa.com',
+      to: "hello@michaeldemesa.com",
       replyTo: email,
       subject: `New Contact Form Message from ${name}`,
       html: generateEmailTemplate(content),
-      attachments: [getEmailHeaderAttachment()]
+      attachments: [getEmailHeaderAttachment()],
     });
 
-    console.log('Contact form email sent:', info.messageId);
+    console.log("Contact form email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Contact form email error:', error.message);
+    console.error("Contact form email error:", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -323,11 +348,11 @@ const sendAppointmentRequestEmail = async (appointmentDetails) => {
     <p><strong>Name:</strong> ${name}</p>
     <p><strong>Email:</strong> ${email}</p>
     <p><strong>Phone:</strong> ${phone}</p>
-    <p><strong>Subject:</strong> ${subject || 'Appointment Request'}</p>
+    <p><strong>Subject:</strong> ${subject || "Appointment Request"}</p>
     
     <div class="tracking-info" style="background-color: #f9f9f9; padding: 15px; margin: 20px 0;">
       <h3>Appointment Details:</h3>
-      <p>${message.replace(/\n/g, '<br>')}</p>
+      <p>${message.replace(/\n/g, "<br>")}</p>
     </div>
     
     <div class="important-note" style="background-color: #fff3e0; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -339,24 +364,24 @@ const sendAppointmentRequestEmail = async (appointmentDetails) => {
   try {
     const info = await transporter.sendMail({
       from: `"MICHAEL DE MESA - BAZI & FENG SHUI CONSULTANCY" <${process.env.SMTP_USER}>`,
-      to: 'hello@michaeldemesa.com',
+      to: "hello@michaeldemesa.com",
       replyTo: email,
       subject: `New Appointment Request from ${name}`,
       html: generateEmailTemplate(content),
-      attachments: [getEmailHeaderAttachment()]
+      attachments: [getEmailHeaderAttachment()],
     });
 
-    console.log('Appointment request email sent:', info.messageId);
+    console.log("Appointment request email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Appointment request email error:', error.message);
+    console.error("Appointment request email error:", error.message);
     return { success: false, error: error.message };
   }
 };
 
 const sendPasswordResetEmail = async (email, resetToken, origin) => {
   const resetUrl = `${origin}/reset-password/${resetToken}`;
-  
+
   const content = `
     <h2>Reset Your Password</h2>
     <p>Dear Valued Customer,</p>
@@ -390,15 +415,15 @@ const sendPasswordResetEmail = async (email, resetToken, origin) => {
     const info = await transporter.sendMail({
       from: `"MICHAEL DE MESA - BAZI & FENG SHUI CONSULTANCY" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: 'Password Reset Request',
+      subject: "Password Reset Request",
       html: generateEmailTemplate(content),
-      attachments: [getEmailHeaderAttachment()]
+      attachments: [getEmailHeaderAttachment()],
     });
 
-    console.log('Password reset email sent:', info.messageId);
+    console.log("Password reset email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Password reset email error:', error.message);
+    console.error("Password reset email error:", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -406,7 +431,9 @@ const sendPasswordResetEmail = async (email, resetToken, origin) => {
 const sendOrderDispatchedEmail = async (details) => {
   const { customerName, customerEmail, trackingNumber } = details;
 
-  const trackingLink = `https://www.ninjavan.co/en-ph/tracking?id=${encodeURIComponent(trackingNumber)}`;
+  const trackingLink = `https://www.ninjavan.co/en-ph/tracking?id=${encodeURIComponent(
+    trackingNumber
+  )}`;
 
   const content = `
     <h2>Your Order is On Its Way!</h2>
@@ -442,24 +469,29 @@ const sendOrderDispatchedEmail = async (details) => {
     const info = await transporter.sendMail({
       from: `"MICHAEL DE MESA - BAZI & FENG SHUI CONSULTANCY" <${process.env.SMTP_USER}>`,
       to: customerEmail,
-      subject: 'Your order is on its way!',
+      subject: "Your order is on its way!",
       html: generateEmailTemplate(content),
-      attachments: [getEmailHeaderAttachment()]
+      attachments: [getEmailHeaderAttachment()],
     });
 
-    console.log('Dispatched email sent:', info.messageId);
+    console.log("Dispatched email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Dispatched email error:', error.message);
+    console.error("Dispatched email error:", error.message);
     return { success: false, error: error.message };
   }
 };
 
 // Send email verification email
-const sendEmailVerification = async (email, verificationToken, userFirstName) => {
-  const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'https://michaeldemesa.com';
+const sendEmailVerification = async (
+  email,
+  verificationToken,
+  userFirstName
+) => {
+  const FRONTEND_BASE_URL =
+    process.env.FRONTEND_BASE_URL || "https://michaeldemesa.com";
   const verificationUrl = `${FRONTEND_BASE_URL}/verify-email/${verificationToken}`;
-  
+
   const content = `
     <h2>Welcome to MICHAEL DE MESA - BAZI & FENG SHUI CONSULTANCY!</h2>
     <p>Hi ${userFirstName},</p>
@@ -500,15 +532,15 @@ const sendEmailVerification = async (email, verificationToken, userFirstName) =>
     const info = await transporter.sendMail({
       from: `"MICHAEL DE MESA - BAZI & FENG SHUI CONSULTANCY" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: 'Verify Your Email Address - Account Activation Required',
+      subject: "Verify Your Email Address - Account Activation Required",
       html: generateEmailTemplate(content),
-      attachments: [getEmailHeaderAttachment()]
+      attachments: [getEmailHeaderAttachment()],
     });
 
-    console.log('Email verification sent:', info.messageId);
+    console.log("Email verification sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Email verification error:', error.message);
+    console.error("Email verification error:", error.message);
     return { success: false, error: error.message };
   }
 };
@@ -521,15 +553,16 @@ const sendTestEmail = async (recipientEmail) => {
     customerEmail: recipientEmail,
     customerPhone: "+63 912 345 6789",
     items: [
-      { name: "Lucky Bamboo Plant", quantity: 2, price: 250.00 },
-      { name: "Crystal Ball", quantity: 1, price: 599.00 }
+      { name: "Lucky Bamboo Plant", quantity: 2, price: 250.0 },
+      { name: "Crystal Ball", quantity: 1, price: 599.0 },
     ],
-    totalAmount: 1099.00,
-    shippingFee: 150.00,
-    shippingAddress: "123 Test Street, Makati City, Metro Manila, Philippines, 1234",
+    totalAmount: 1099.0,
+    shippingFee: 150.0,
+    shippingAddress:
+      "123 Test Street, Makati City, Metro Manila, Philippines, 1234",
     paymentMethod: "DragonPay",
     paymentReference: "DP123456789",
-    trackingNumber: "TRACK123456789"
+    trackingNumber: "TRACK123456789",
   };
 
   return sendOrderConfirmationEmail(sampleOrderDetails);
@@ -537,7 +570,7 @@ const sendTestEmail = async (recipientEmail) => {
 
 // Cleanup function to close connections gracefully
 const cleanup = async () => {
-  console.log('Starting email service cleanup...');
+  console.log("Starting email service cleanup...");
   try {
     // Wait for any pending email operations to complete (up to 5 seconds)
     await new Promise((resolve) => {
@@ -545,35 +578,35 @@ const cleanup = async () => {
         if (transporter.isIdle()) {
           resolve();
         } else {
-          console.log('Waiting for email operations to complete...');
+          console.log("Waiting for email operations to complete...");
           setTimeout(checkPool, 500);
         }
       };
       checkPool();
     }).then(() => {
       transporter.close();
-      console.log('Email service cleanup completed');
+      console.log("Email service cleanup completed");
     });
   } catch (error) {
-    console.error('Error during cleanup:', error);
+    console.error("Error during cleanup:", error);
     // Ensure we still close connections even if there's an error
     try {
       transporter.close();
     } catch (e) {
-      console.error('Error during forced cleanup:', e);
+      console.error("Error during forced cleanup:", e);
     }
   }
 };
 
 // Handle process termination
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, starting cleanup...');
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received, starting cleanup...");
   await cleanup();
   process.exit(0);
 });
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received, starting cleanup...');
+process.on("SIGINT", async () => {
+  console.log("SIGINT received, starting cleanup...");
   await cleanup();
   process.exit(0);
 });
@@ -587,5 +620,5 @@ module.exports = {
   sendOrderDispatchedEmail,
   sendEmailVerification,
   sendReviewRequestEmail,
-  cleanup
+  cleanup,
 };

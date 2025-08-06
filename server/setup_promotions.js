@@ -1,20 +1,20 @@
-const mysql = require('mysql2/promise');
+const mysql = require("mysql2/promise");
 
 async function setupPromotions() {
   let connection;
   try {
     // Create connection using the same config as your app
     connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'u561778649_pakbettv'
+      host: process.env.DB_HOST || "localhost",
+      user: process.env.DB_USER || "root",
+      password: process.env.DB_PASSWORD || "",
+      database: process.env.DB_NAME || "u561778649_pakbettv",
     });
 
-    console.log('Connected to database...');
+    console.log("Connected to database...");
 
     // Create promotions table
-    console.log('Creating promotions table...');
+    console.log("Creating promotions table...");
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS promotions (
         promotion_id INT(11) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -48,10 +48,10 @@ async function setupPromotions() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `);
-    console.log('Promotions table created successfully!');
+    console.log("Promotions table created successfully!");
 
     // Create promotion_usage table
-    console.log('Creating promotion_usage table...');
+    console.log("Creating promotion_usage table...");
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS promotion_usage (
         usage_id BIGINT(20) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -68,10 +68,10 @@ async function setupPromotions() {
         UNIQUE KEY unique_user_promotion (user_id, promotion_id, order_id)
       )
     `);
-    console.log('Promotion_usage table created successfully!');
+    console.log("Promotion_usage table created successfully!");
 
     // Insert test promotion
-    console.log('Creating PISOSHIPPING promotion...');
+    console.log("Creating PISOSHIPPING promotion...");
     await connection.execute(`
       INSERT IGNORE INTO promotions (
         promotion_code,
@@ -103,7 +103,7 @@ async function setupPromotions() {
     `);
 
     // Insert free shipping promotion
-    console.log('Creating FREESHIP1000 promotion...');
+    console.log("Creating FREESHIP1000 promotion...");
     await connection.execute(`
       INSERT IGNORE INTO promotions (
         promotion_code,
@@ -130,11 +130,10 @@ async function setupPromotions() {
       )
     `);
 
-    console.log('✅ All promotions setup completed successfully!');
-    console.log('You can now use promotion codes: PISOSHIPPING, FREESHIP1000');
-
+    console.log("✅ All promotions setup completed successfully!");
+    console.log("You can now use promotion codes: PISOSHIPPING, FREESHIP1000");
   } catch (error) {
-    console.error('❌ Error setting up promotions:', error);
+    console.error("❌ Error setting up promotions:", error);
   } finally {
     if (connection) {
       await connection.end();

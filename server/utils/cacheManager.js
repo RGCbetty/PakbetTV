@@ -1,5 +1,5 @@
 // Cache clearing utilities for performance optimization
-const NodeCache = require('node-cache');
+const NodeCache = require("node-cache");
 
 // Import caches from controllers (we'll need to modify this approach)
 // For now, we'll create a simple cache manager
@@ -13,18 +13,18 @@ class CacheManager {
     this.caches.set(cacheName, cacheInstance);
   }
 
-  clearUserCache(userId, cacheType = 'all') {
+  clearUserCache(userId, cacheType = "all") {
     console.log(`Clearing cache for user ${userId}, type: ${cacheType}`);
-    
-    if (cacheType === 'all' || cacheType === 'orders') {
-      const orderCache = this.caches.get('orders');
+
+    if (cacheType === "all" || cacheType === "orders") {
+      const orderCache = this.caches.get("orders");
       if (orderCache) {
         orderCache.del(`orders_${userId}`);
       }
     }
 
-    if (cacheType === 'all' || cacheType === 'cart') {
-      const cartCache = this.caches.get('cart');
+    if (cacheType === "all" || cacheType === "cart") {
+      const cartCache = this.caches.get("cart");
       if (cartCache) {
         cartCache.del(`cart_${userId}`);
       }
@@ -32,7 +32,7 @@ class CacheManager {
   }
 
   clearAllCache() {
-    console.log('Clearing all caches');
+    console.log("Clearing all caches");
     this.caches.forEach((cache, name) => {
       cache.flushAll();
       console.log(`Cleared ${name} cache`);

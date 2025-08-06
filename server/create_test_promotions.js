@@ -1,9 +1,9 @@
-const db = require('./config/db');
+const db = require("./config/db");
 
 async function createPromotions() {
   try {
-    console.log('Creating test promotions...');
-    
+    console.log("Creating test promotions...");
+
     // Create PISOSHIPPING promotion
     const [result1] = await db.query(`
       INSERT INTO promotions (
@@ -34,9 +34,9 @@ async function createPromotions() {
         'Valid for orders with minimum amount of ₱500. Limited to one use per customer. Cannot be combined with other promotions.'
       )
     `);
-    
-    console.log('PISOSHIPPING promotion created with ID:', result1.insertId);
-    
+
+    console.log("PISOSHIPPING promotion created with ID:", result1.insertId);
+
     // Create free shipping promotion
     const [result2] = await db.query(`
       INSERT INTO promotions (
@@ -63,15 +63,14 @@ async function createPromotions() {
         'Free shipping on orders ₱1000 and above'
       )
     `);
-    
-    console.log('FREESHIP1000 promotion created with ID:', result2.insertId);
-    console.log('Test promotions created successfully!');
-    
+
+    console.log("FREESHIP1000 promotion created with ID:", result2.insertId);
+    console.log("Test promotions created successfully!");
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
-      console.log('Promotions already exist, skipping creation.');
+    if (error.code === "ER_DUP_ENTRY") {
+      console.log("Promotions already exist, skipping creation.");
     } else {
-      console.error('Error creating promotions:', error);
+      console.error("Error creating promotions:", error);
     }
   } finally {
     process.exit(0);

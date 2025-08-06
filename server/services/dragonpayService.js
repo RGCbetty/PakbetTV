@@ -1,20 +1,20 @@
-const crypto = require('crypto');
-const axios = require('axios');
-const config = require('../config/keys');
+const crypto = require("crypto");
+const axios = require("axios");
+const config = require("../config/keys");
 
 class DragonpayService {
   constructor() {
-    this.merchantId = config.DRAGONPAY_MERCHANT_ID || 'PAKBETTV';
-    this.secretKey = config.DRAGONPAY_SECRET_KEY || 'test_key';
+    this.merchantId = config.DRAGONPAY_MERCHANT_ID || "PAKBETTV";
+    this.secretKey = config.DRAGONPAY_SECRET_KEY || "test_key";
     this.baseUrl = config.DRAGONPAY_BASE_URL;
     this.apiUrl = config.DRAGONPAY_API_URL;
     this.environment = config.DRAGONPAY_ENV;
-    
-    console.log('DragonPay Service initialized with:', {
+
+    console.log("DragonPay Service initialized with:", {
       environment: this.environment,
       merchantId: this.merchantId,
       baseUrl: this.baseUrl,
-      apiUrl: this.apiUrl
+      apiUrl: this.apiUrl,
     });
   }
 
@@ -27,22 +27,23 @@ class DragonpayService {
     try {
       // Create the digest for authentication
       const digestString = `${this.merchantId}:${txnId}:${this.secretKey}`;
-      const digest = crypto.createHash('sha1')
+      const digest = crypto
+        .createHash("sha1")
         .update(digestString)
-        .digest('hex');
+        .digest("hex");
 
       // Build the inquiry URL
       const inquiryUrl = `${this.baseUrl}/Query.aspx?merchantid=${this.merchantId}&txnid=${txnId}&digest=${digest}`;
-      
+
       console.log(`Dragonpay inquiry: ${txnId}`);
-      console.log('Inquiry URL:', '[REDACTED]');
+      console.log("Inquiry URL:", "[REDACTED]");
 
       // Make the API call
       const response = await axios.get(inquiryUrl, {
         timeout: 30000, // 30 second timeout
         headers: {
-          'User-Agent': 'FengShui-ECommerce/1.0'
-        }
+          "User-Agent": "FengShui-ECommerce/1.0",
+        },
       });
 
       // Parse the response
@@ -50,20 +51,19 @@ class DragonpayService {
       console.log(`Dragonpay response: ${txnId}`);
 
       return this.parseInquiryResponse(responseText, txnId);
-
     } catch (error) {
       console.error(`Dragonpay inquiry error: ${txnId}:`, error.message);
-      
+
       if (error.response) {
-        console.error('Response status:', error.response?.status);
-        console.error('Response data:', error.response?.data);
+        console.error("Response status:", error.response?.status);
+        console.error("Response data:", error.response?.data);
       }
-      
+
       return {
         txnId,
-        status: 'ERROR',
+        status: "ERROR",
         message: `API Error: ${error.message}`,
-        success: false
+        success: false,
       };
     }
   }
@@ -78,14 +78,14 @@ class DragonpayService {
     const result = {
       txnId,
       success: false,
-      status: 'UNKNOWN',
-      message: responseText
+      status: "UNKNOWN",
+      message: responseText,
     };
 
     // Handle different response formats from Dragonpay
-    if (responseText.includes(':')) {
+    if (responseText.includes(":")) {
       // Format: Status:RefNo or Status:RefNo:Message
-      const parts = responseText.split(':');
+      const parts = responseText.split(":");
       result.status = parts[0];
       result.refNo = parts[1] || null;
       result.message = parts[2] || responseText;
@@ -96,37 +96,37 @@ class DragonpayService {
 
     // Determine success based on status
     switch (result.status.toUpperCase()) {
-      case 'S':
+      case "S":
         result.success = true;
-        result.message = 'Payment successful';
+        result.message = "Payment successful";
         break;
-      case 'F':
+      case "F":
         result.success = false;
-        result.message = 'Payment failed';
+        result.message = "Payment failed";
         break;
-      case 'P':
+      case "P":
         result.success = false;
-        result.message = 'Payment pending';
+        result.message = "Payment pending";
         break;
-      case 'U':
+      case "U":
         result.success = false;
-        result.message = 'Payment status unknown';
+        result.message = "Payment status unknown";
         break;
-      case 'R':
+      case "R":
         result.success = false;
-        result.message = 'Payment refunded';
+        result.message = "Payment refunded";
         break;
-      case 'K':
+      case "K":
         result.success = false;
-        result.message = 'Payment charged back';
+        result.message = "Payment charged back";
         break;
-      case 'V':
+      case "V":
         result.success = false;
-        result.message = 'Payment voided';
+        result.message = "Payment voided";
         break;
-      case 'A':
+      case "A":
         result.success = false;
-        result.message = 'Payment authorized but not captured';
+        result.message = "Payment authorized but not captured";
         break;
       default:
         result.success = false;
@@ -143,15 +143,24 @@ class DragonpayService {
    */
   mapStatusToInternal(dpStatus) {
     switch (dpStatus.toUpperCase()) {
-      case 'S': return 'completed';
-      case 'F': return 'failed';
-      case 'P': return 'waiting_for_confirmation';
-      case 'U': return 'unknown';
-      case 'R': return 'refunded';
-      case 'K': return 'chargeback';
-      case 'V': return 'void';
-      case 'A': return 'authorized';
-      default: return 'unknown';
+      case "S":
+        return "completed";
+      case "F":
+        return "failed";
+      case "P":
+        return "waiting_for_confirmation";
+      case "U":
+        return "unknown";
+      case "R":
+        return "refunded";
+      case "K":
+        return "chargeback";
+      case "V":
+        return "void";
+      case "A":
+        return "authorized";
+      default:
+        return "unknown";
     }
   }
 
@@ -162,10 +171,14 @@ class DragonpayService {
    */
   mapStatusToOrderStatus(dpStatus) {
     switch (dpStatus.toUpperCase()) {
-      case 'S': return 'for_packing';
-      case 'F': return 'cancelled';
-      case 'P': return 'processing';
-      default: return 'processing';
+      case "S":
+        return "for_packing";
+      case "F":
+        return "cancelled";
+      case "P":
+        return "processing";
+      default:
+        return "processing";
     }
   }
 
@@ -176,12 +189,16 @@ class DragonpayService {
    */
   mapStatusToOrderPaymentStatus(dpStatus) {
     switch (dpStatus.toUpperCase()) {
-      case 'S': return 'paid';
-      case 'F': return 'failed';
-      case 'P': return 'awaiting_for_confirmation';
-      default: return 'awaiting_for_confirmation';
+      case "S":
+        return "paid";
+      case "F":
+        return "failed";
+      case "P":
+        return "awaiting_for_confirmation";
+      default:
+        return "awaiting_for_confirmation";
     }
   }
 }
 
-module.exports = new DragonpayService(); 
+module.exports = new DragonpayService();

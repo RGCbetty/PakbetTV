@@ -1,13 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const mysql = require('mysql2/promise');
+const mysql = require("mysql2/promise");
 
 // Admin endpoint to setup promotions
-router.post('/setup', async (req, res) => {
+router.post("/setup", async (req, res) => {
   try {
-    const db = require('../config/db');
-    
-    console.log('Setting up promotions tables...');
+    const db = require("../config/db");
+
+    console.log("Setting up promotions tables...");
 
     // Create promotions table
     await db.execute(`
@@ -90,16 +90,15 @@ router.post('/setup', async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Promotions tables and test data created successfully!',
-      promotions: ['PISOSHIPPING', 'FREESHIP1000']
+      message: "Promotions tables and test data created successfully!",
+      promotions: ["PISOSHIPPING", "FREESHIP1000"],
     });
-
   } catch (error) {
-    console.error('Error setting up promotions:', error);
+    console.error("Error setting up promotions:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to setup promotions',
-      error: error.message
+      message: "Failed to setup promotions",
+      error: error.message,
     });
   }
 });

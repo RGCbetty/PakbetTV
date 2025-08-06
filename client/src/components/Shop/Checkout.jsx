@@ -65,6 +65,7 @@ const Checkout = () => {
 
   const selectedItems = cartItems.filter(item => item.selected);
 
+
   // Helper function to get the effective price (discounted if available)
   const getEffectivePrice = (item) => {
     // Use discounted price if it exists and is greater than 0, otherwise use original price

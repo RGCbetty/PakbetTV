@@ -1,58 +1,67 @@
-const axios = require('axios');
+const axios = require("axios");
 
 async function testPromotions() {
-  const baseURL = 'http://localhost:3000/api';
-  
+  const baseURL = "http://localhost:3000/api";
+
   try {
-    console.log('🔧 Setting up promotions tables...');
-    
+    console.log("🔧 Setting up promotions tables...");
+
     // Setup promotions tables
     const setupResponse = await axios.post(`${baseURL}/setup/setup`);
-    console.log('✅ Setup successful:', setupResponse.data.message);
-    
-    console.log('\n📋 Available promotions:', setupResponse.data.promotions);
-    
-    console.log('\n🧪 Testing promotion validation (without auth - should fail)...');
-    
+    console.log("✅ Setup successful:", setupResponse.data.message);
+
+    console.log("\n📋 Available promotions:", setupResponse.data.promotions);
+
+    console.log(
+      "\n🧪 Testing promotion validation (without auth - should fail)..."
+    );
+
     try {
       const testResponse = await axios.post(`${baseURL}/promotions/validate`, {
-        code: 'PISOSHIPPING',
-        order_amount: 600
+        code: "PISOSHIPPING",
+        order_amount: 600,
       });
-      console.log('❌ Should have failed without auth');
+      console.log("❌ Should have failed without auth");
     } catch (error) {
       if (error.response.status === 401) {
-        console.log('✅ Correctly requires authentication');
+        console.log("✅ Correctly requires authentication");
       } else {
-        console.log('❓ Unexpected error:', error.response.data);
+        console.log("❓ Unexpected error:", error.response.data);
       }
     }
-    
-    console.log('\n🔍 Testing public promotion lookup...');
-    
+
+    console.log("\n🔍 Testing public promotion lookup...");
+
     try {
-      const publicResponse = await axios.get(`${baseURL}/promotions/PISOSHIPPING`);
-      console.log('✅ Public promotion lookup successful:', publicResponse.data.promotion.promotion_name);
+      const publicResponse = await axios.get(
+        `${baseURL}/promotions/PISOSHIPPING`
+      );
+      console.log(
+        "✅ Public promotion lookup successful:",
+        publicResponse.data.promotion.promotion_name
+      );
     } catch (error) {
-      console.log('❌ Public promotion lookup failed:', error.response?.data);
+      console.log("❌ Public promotion lookup failed:", error.response?.data);
     }
-    
-    console.log('\n🎯 Testing deprecated voucher endpoint...');
-    
+
+    console.log("\n🎯 Testing deprecated voucher endpoint...");
+
     try {
       const voucherResponse = await axios.post(`${baseURL}/vouchers/validate`, {
-        code: 'PISOSHIPPING',
-        order_amount: 600
+        code: "PISOSHIPPING",
+        order_amount: 600,
       });
-      console.log('❓ Voucher response:', voucherResponse.data);
+      console.log("❓ Voucher response:", voucherResponse.data);
     } catch (error) {
-      console.log('✅ Voucher endpoint correctly shows deprecation:', error.response?.data?.message);
+      console.log(
+        "✅ Voucher endpoint correctly shows deprecation:",
+        error.response?.data?.message
+      );
     }
-    
   } catch (error) {
-    console.error('❌ Test failed:', error.message);
+    console.error("❌ Test failed:", error.message);
     if (error.response) {
-      console.error('Response:', error.response.data);
+      console.error("Response:", error.response.data);
     }
   }
 }

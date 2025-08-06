@@ -2,9 +2,9 @@
 // Export each handler as a named function, do not change any logic.
 // (Insert all route handler logic and helper functions from users.js here)
 
-const { validationResult } = require('express-validator');
-const db = require('../config/db');
-const bcrypt = require('bcryptjs');
+const { validationResult } = require("express-validator");
+const db = require("../config/db");
+const bcrypt = require("bcryptjs");
 
 // User registration
 exports.registerUser = async (req, res) => {
@@ -18,13 +18,13 @@ exports.registerUser = async (req, res) => {
 
     // Check if user already exists (optimized / limit 1)
     const [existingRows] = await db.query(
-      'SELECT 1 FROM users WHERE email = ? OR username = ? LIMIT 1',
+      "SELECT 1 FROM users WHERE email = ? OR username = ? LIMIT 1",
       [email, username]
     );
 
     if (existingRows.length > 0) {
-      return res.status(400).json({ 
-        errors: [{ msg: 'User already exists' }] 
+      return res.status(400).json({
+        errors: [{ msg: "User already exists" }],
       });
     }
 
@@ -34,28 +34,30 @@ exports.registerUser = async (req, res) => {
 
     // Insert user into database
     const [insertResult] = await db.query(
-      'INSERT INTO users (first_name, last_name, username, email, password) VALUES (?, ?, ?, ?, ?)',
+      "INSERT INTO users (first_name, last_name, username, email, password) VALUES (?, ?, ?, ?, ?)",
       [firstName, lastName, username, email, hashedPassword]
     );
 
     res.status(201).json({
-      message: 'User registered successfully',
-      userId: insertResult.insertId
+      message: "User registered successfully",
+      userId: insertResult.insertId,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 // Get all users (admin only)
 exports.getAllUsers = async (req, res) => {
   try {
-    const [users] = await db.query('SELECT user_id, first_name, last_name, username, email, created_at FROM users');
+    const [users] = await db.query(
+      "SELECT user_id, first_name, last_name, username, email, created_at FROM users"
+    );
     res.json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -69,13 +71,15 @@ exports.getShippingAddresses = async (req, res) => {
       [req.user.id]
     );
 
-    console.log(`📦 Fetched ${addresses.length} shipping addresses for user ${req.user.id}`);
+    console.log(
+      `📦 Fetched ${addresses.length} shipping addresses for user ${req.user.id}`
+    );
     // Note: Detailed address logging removed to reduce log noise
 
     res.json(addresses);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -90,14 +94,14 @@ exports.updateProfile = async (req, res) => {
     const { firstName, lastName, email, username, phone } = req.body;
 
     await db.query(
-      'UPDATE users SET first_name = ?, last_name = ?, email = ?, username = ?, phone = ? WHERE user_id = ?',
+      "UPDATE users SET first_name = ?, last_name = ?, email = ?, username = ?, phone = ? WHERE user_id = ?",
       [firstName, lastName, email, username, phone || null, req.user.id]
     );
 
-    res.json({ message: 'Profile updated successfully' });
+    res.json({ message: "Profile updated successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -105,20 +109,20 @@ exports.updateProfile = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const [rows] = await db.query(
-      'SELECT user_id, first_name, last_name, username, email, created_at FROM users WHERE user_id = ?',
+      "SELECT user_id, first_name, last_name, username, email, created_at FROM users WHERE user_id = ?",
       [req.params.id]
     );
 
     const user = rows[0];
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(user);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -128,25 +132,25 @@ exports.updateUserById = async (req, res) => {
     const { firstName, lastName, email, username, phone } = req.body;
 
     await db.query(
-      'UPDATE users SET first_name = ?, last_name = ?, email = ?, username = ?, phone = ? WHERE user_id = ?',
+      "UPDATE users SET first_name = ?, last_name = ?, email = ?, username = ?, phone = ? WHERE user_id = ?",
       [firstName, lastName, email, username, phone || null, req.params.id]
     );
 
-    res.json({ message: 'User updated successfully' });
+    res.json({ message: "User updated successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 // Delete user by ID
 exports.deleteUserById = async (req, res) => {
   try {
-    await db.query('DELETE FROM users WHERE user_id = ?', [req.params.id]);
-    res.json({ message: 'User deleted successfully' });
+    await db.query("DELETE FROM users WHERE user_id = ?", [req.params.id]);
+    res.json({ message: "User deleted successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -154,13 +158,13 @@ exports.deleteUserById = async (req, res) => {
 exports.getUserProfile = async (req, res) => {
   try {
     const [rowsProfile] = await db.query(
-      'SELECT user_id, first_name, last_name, username, email, phone, created_at FROM users WHERE user_id = ?',
+      "SELECT user_id, first_name, last_name, username, email, phone, created_at FROM users WHERE user_id = ?",
       [req.user.id]
     );
     res.json(rowsProfile[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -169,11 +173,11 @@ exports.profileDebug = async (req, res) => {
   try {
     res.json({
       user: req.user,
-      session: req.session
+      session: req.session,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -182,7 +186,10 @@ exports.addOrUpdateShippingAddress = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors on addOrUpdateShippingAddress:', errors.array());
+      console.log(
+        "Validation errors on addOrUpdateShippingAddress:",
+        errors.array()
+      );
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -195,8 +202,8 @@ exports.addOrUpdateShippingAddress = async (req, res) => {
       city,
       state,
       postcode,
-      country = 'PH',
-      address_type = 'home',
+      country = "PH",
+      address_type = "home",
       is_default = false,
       // Philippine-specific / extended location details
       region,
@@ -205,12 +212,15 @@ exports.addOrUpdateShippingAddress = async (req, res) => {
       barangay,
       street_name,
       building,
-      house_number
+      house_number,
     } = req.body;
 
     // If this new address should be the default one, clear existing defaults first
     if (is_default) {
-      await db.query('UPDATE user_shipping_details SET is_default = 0 WHERE user_id = ?', [req.user.id]);
+      await db.query(
+        "UPDATE user_shipping_details SET is_default = 0 WHERE user_id = ?",
+        [req.user.id]
+      );
     }
 
     // Insert the address. We explicitly list every column that exists in the table so we
@@ -252,20 +262,25 @@ exports.addOrUpdateShippingAddress = async (req, res) => {
         barangay || null,
         street_name || null,
         building || null,
-        house_number || null
+        house_number || null,
       ]
     );
 
     // Debug: confirm insertId
-    console.log('Inserted new shipping address with id', insertAddress.insertId, 'for user', req.user.id);
+    console.log(
+      "Inserted new shipping address with id",
+      insertAddress.insertId,
+      "for user",
+      req.user.id
+    );
 
     res.status(201).json({
-      message: 'Shipping address added successfully',
-      addressId: insertAddress.insertId
+      message: "Shipping address added successfully",
+      addressId: insertAddress.insertId,
     });
   } catch (err) {
-    console.error('Error in addOrUpdateShippingAddress:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error in addOrUpdateShippingAddress:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -273,13 +288,13 @@ exports.addOrUpdateShippingAddress = async (req, res) => {
 exports.deleteShippingAddress = async (req, res) => {
   try {
     await db.query(
-      'DELETE FROM user_shipping_details WHERE id = ? AND user_id = ?',
+      "DELETE FROM user_shipping_details WHERE id = ? AND user_id = ?",
       [req.params.id, req.user.id]
     );
-    res.json({ message: 'Shipping address deleted successfully' });
+    res.json({ message: "Shipping address deleted successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -288,13 +303,13 @@ exports.updateShipping = async (req, res) => {
   try {
     const { addressId } = req.body;
     await db.query(
-      'UPDATE users SET default_shipping_id = ? WHERE user_id = ?',
+      "UPDATE users SET default_shipping_id = ? WHERE user_id = ?",
       [addressId, req.user.id]
     );
-    res.json({ message: 'Shipping details updated successfully' });
+    res.json({ message: "Shipping details updated successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -307,26 +322,26 @@ exports.updateUsername = async (req, res) => {
     }
 
     const { username } = req.body;
-    await db.query(
-      'UPDATE users SET username = ? WHERE user_id = ?',
-      [username, req.user.id]
-    );
-    res.json({ message: 'Username updated successfully' });
+    await db.query("UPDATE users SET username = ? WHERE user_id = ?", [
+      username,
+      req.user.id,
+    ]);
+    res.json({ message: "Username updated successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 // Delete account
 exports.deleteAccount = async (req, res) => {
   try {
-    await db.query('DELETE FROM users WHERE user_id = ?', [req.user.id]);
+    await db.query("DELETE FROM users WHERE user_id = ?", [req.user.id]);
     req.session.destroy();
-    res.json({ message: 'Account deleted successfully' });
+    res.json({ message: "Account deleted successfully" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -335,12 +350,12 @@ exports.canDeleteAccount = async (req, res) => {
   try {
     // First check if user exists
     const [user] = await db.query(
-      'SELECT user_id FROM users WHERE user_id = ?',
+      "SELECT user_id FROM users WHERE user_id = ?",
       [req.user.id]
     );
 
     if (!user.length) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Check for active orders
@@ -351,14 +366,14 @@ exports.canDeleteAccount = async (req, res) => {
 
     const canDelete = activeOrders.length === 0;
 
-    res.json({ 
+    res.json({
       canDelete,
-      message: canDelete ? 
-        'Account can be deleted' : 
-        'Cannot delete account while there are active orders'
+      message: canDelete
+        ? "Account can be deleted"
+        : "Cannot delete account while there are active orders",
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
