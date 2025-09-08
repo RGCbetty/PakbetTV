@@ -1,6 +1,7 @@
 import React from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import API_BASE_URL from "../../config";
 
 const NewsletterPopup = (hasSubscribed) => {
     if (hasSubscribed) return;
@@ -30,7 +31,7 @@ const NewsletterPopup = (hasSubscribed) => {
             return false;
           }
         try {
-            const response = await fetch("http://localhost:5173/api/subscribe", {
+            const response = await fetch(`${API_BASE_URL}/api/subscribe`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email }),
