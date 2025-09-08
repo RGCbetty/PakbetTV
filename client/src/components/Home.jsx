@@ -5,6 +5,7 @@ import { useProducts } from '../hooks/useProducts';
 import './Home.css';
 import NavBar from './NavBar';
 import Footer from './Footer';
+import ConsentManager from "./ConsentManager/ConsentManager";
 import API_BASE_URL from '../config';
 import ProductCard from './common/ProductCard';
 import axios from 'axios';
@@ -13,8 +14,9 @@ import './Home/HomeHeroSection.css';
 import OurService from './Home/OurService';
 import DailyHoroScopeSection from './Home/DailyHoroScopeSection';
 import './Home/Banner.css'; // Import the CSS for the banner
-import Banner from './Home/Banner';
+import CheckoutToast from "./CheckoutToast/CheckoutToast";
 import DailyVideo from './Home/DailyVideo';
+import NewsletterPopup from './Newsletter/Newsletter';
 
 const constructUrl = (baseUrl, path) => {
   const defaultImageUrl = '/images/default-placeholder.png'; 
@@ -213,7 +215,8 @@ const renderNewArrivals = () => (
   return (
     <div className="home-page">
            <NavBar />
-
+<ConsentManager />
+<CheckoutToast/>
 <section className="home-hero-section">
       {/* Background video */}
       <video
