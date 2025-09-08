@@ -169,6 +169,7 @@ const deliveryRoutes = require("./routes/delivery");
 const adminRoutes = require("./routes/admin");
 const cmsRoutes = require("./routes/cms");
 const emailRoutes = require("./routes/email");
+const subscribeRoutes = require("./routes/subscribe");
 const locationRoutes = require("./routes/locations");
 const voucherRoutes = require("./routes/vouchers");
 const promotionRoutes = require("./routes/promotions");
@@ -197,6 +198,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/delivery", deliveryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/cms", cmsRoutes);
+app.use("/api/subscribe", subscribeRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/vouchers", voucherRoutes); // Keep for backward compatibility

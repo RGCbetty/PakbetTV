@@ -1,0 +1,23 @@
+/* Position in semi upper right */
+.Toastify__toast-container--top-right {
+  top: 18%; /* push down a bit */
+  right: 20px;
+}
+.Toastify__toast--info .Toastify__toast-icon {
+  background: transparent !important;
+  color: #ffcc00 !important; /* make icon yellow */
+  font-size: 18px;
+}
+/* Custom homepage toast style */
+.homepage-toast {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 1px solid #ffcc00 !important;
+  border-radius: 12px !important;
+  font-weight: 500;
+}
+
+/* Yellow progress bar */
+.custom-progress {
+  background: #ffcc00 !important;
+}

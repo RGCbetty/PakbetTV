@@ -130,7 +130,6 @@ async function getCart(req, res) {
     `,
       [userId]
     );
-    console.log("🚀 ~ getCart ~ cartItems:", cartItems);
 
     // Validate and process cart items
     const validatedItems = cartItems.filter((item) => validateCartItem(item));

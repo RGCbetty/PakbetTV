@@ -588,7 +588,6 @@ async function createOrder(req, res) {
   try {
     const token = await ninjaVanAuth.getValidToken();
     const orderData = req.body;
-    console.log("🚀 ~ createOrder ~ orderData:", orderData);
 
     // DEBUG: Log token and payload information (server-side only)
     console.log("🚚 [NINJAVAN] Creating order via API endpoint:", {
@@ -1470,12 +1469,10 @@ async function createShippingOrder(orderId) {
       weight: item.weight,
       is_dangerous_good: false,
     }));
-    console.log("🚀 ~ createShippingOrder ~ items:", items);
     // Calculate total weight
     const totalWeight =
       items.reduce((total, item) => total + item.quantity * item.weight, 0) ||
       1.5;
-    console.log("🚀 ~ createShippingOrder ~ totalWeight:", totalWeight);
     console.log(`Calculated total weight: ${totalWeight}kg`);
 
     // Create unique tracking number
