@@ -38,7 +38,7 @@ export default function CheckoutToast() {
     // Then show randomly every 20–40 seconds
     const interval = setInterval(() => {
       showRandomToast();
-    }, Math.floor(Math.random() * (10000 - 5000) + 5000));
+    }, Math.floor(Math.random() * (25000 - 15000) + 15000));
 
     return () => {
       clearTimeout(timeout);
